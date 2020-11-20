@@ -9,6 +9,7 @@ import (
 )
 
 var cm *Manager
+var defaultTTL = "5m"
 
 // Middleware creates a middleware to handle cache
 func Middleware(config *Config, cache CacheInterface) echo.MiddlewareFunc {

@@ -22,6 +22,16 @@ func (o *MockCache) Set(k string, b []byte) error {
 	return args.Error(0)
 }
 
+func (o *MockCache) Delete(k string) error {
+	args := o.Called(k)
+	return args.Error(0)
+}
+
+func (o *MockCache) Reset() error {
+	args := o.Called()
+	return args.Error(0)
+}
+
 func TestMatchPathWithExactMatch(t *testing.T) {
 	conf := &Config{
 		Enabled: true,
