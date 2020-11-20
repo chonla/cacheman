@@ -1,6 +1,6 @@
 # CacheMan
 
-Cache Middleware for Echo
+CacheMan was designed to be middleware for Echo for caching response from `GET` request for a period of time.
 
 ## Usage
 
