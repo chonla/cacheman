@@ -13,13 +13,16 @@ import (
 
 // Manager is cache manager
 type Manager struct {
-	Enabled           bool
-	Verbose           bool
-	Cache             CacheInterface
-	Routes            []string
-	RouteCount        int
-	ComparableRoutes  []*regexp.Regexp
-	AdditionalHeaders map[string]string
+	Enabled                  bool
+	Verbose                  bool
+	Cache                    CacheInterface
+	Routes                   []string
+	ExcludedRoutes           []string
+	RouteCount               int
+	ExcludedRouteCount       int
+	ComparableRoutes         []*regexp.Regexp
+	ComparableExcludedRoutes []*regexp.Regexp
+	AdditionalHeaders        map[string]string
 }
 
 // Content is cached content
@@ -32,15 +35,19 @@ type Content struct {
 // NewCacheManager creates a cache manager
 func NewCacheManager(conf *Config, cache CacheInterface) *Manager {
 	comparableRoutes := convertToComparableRoutes(conf.Paths)
+	comparableExcludedRoutes := convertToComparableRoutes(conf.ExcludedPaths)
 
 	return &Manager{
-		Enabled:           conf.Enabled,
-		Verbose:           conf.Verbose,
-		Cache:             cache,
-		Routes:            conf.Paths,
-		ComparableRoutes:  comparableRoutes,
-		RouteCount:        len(conf.Paths),
-		AdditionalHeaders: conf.AdditionalHeaders,
+		Enabled:                  conf.Enabled,
+		Verbose:                  conf.Verbose,
+		Cache:                    cache,
+		Routes:                   conf.Paths,
+		ComparableRoutes:         comparableRoutes,
+		ExcludedRoutes:           conf.ExcludedPaths,
+		ComparableExcludedRoutes: comparableExcludedRoutes,
+		RouteCount:               len(conf.Paths),
+		ExcludedRouteCount:       len(conf.ExcludedPaths),
+		AdditionalHeaders:        conf.AdditionalHeaders,
 	}
 }
 
@@ -73,6 +80,11 @@ func convertToComparableRoutes(routes []string) []*regexp.Regexp {
 
 // TestPath return true if path matches a route, otherwise returns false
 func (c *Manager) TestPath(path string) bool {
+	for routeIndex := 0; routeIndex < c.ExcludedRouteCount; routeIndex++ {
+		if c.ComparableExcludedRoutes[routeIndex].MatchString(path) {
+			return false
+		}
+	}
 	for routeIndex := 0; routeIndex < c.RouteCount; routeIndex++ {
 		if c.ComparableRoutes[routeIndex].MatchString(path) {
 			return true

@@ -32,6 +32,23 @@ func (o *MockCache) Reset() error {
 	return args.Error(0)
 }
 
+func TestMatchPathWithWildcard(t *testing.T) {
+	conf := &Config{
+		Enabled: true,
+		Verbose: false,
+		TTL:     "1m",
+		Paths: []string{
+			"/.*",
+		},
+		AdditionalHeaders: map[string]string{},
+	}
+	cm := NewCacheManager(conf, nil)
+
+	result := cm.TestPath("/test2")
+
+	assert.True(t, result)
+}
+
 func TestMatchPathWithExactMatch(t *testing.T) {
 	conf := &Config{
 		Enabled: true,
@@ -206,4 +223,44 @@ func TestGetCacheShouldReturnFalseWhenCacheMisses(t *testing.T) {
 	mockCache.AssertCalled(t, "Get", "/test2")
 	assert.Equal(t, expectedContent, result)
 	assert.False(t, ok)
+}
+
+func TestMatchPathWithWildcardAndExcludsion(t *testing.T) {
+	conf := &Config{
+		Enabled: true,
+		Verbose: false,
+		TTL:     "1m",
+		Paths: []string{
+			"/.*",
+		},
+		ExcludedPaths: []string{
+			"/test2",
+		},
+		AdditionalHeaders: map[string]string{},
+	}
+	cm := NewCacheManager(conf, nil)
+
+	result := cm.TestPath("/test2")
+
+	assert.False(t, result)
+}
+
+func TestMatchPathWithWildcardAndExcludsionWildcard(t *testing.T) {
+	conf := &Config{
+		Enabled: true,
+		Verbose: false,
+		TTL:     "1m",
+		Paths: []string{
+			"/.*",
+		},
+		ExcludedPaths: []string{
+			"/.*",
+		},
+		AdditionalHeaders: map[string]string{},
+	}
+	cm := NewCacheManager(conf, nil)
+
+	result := cm.TestPath("/")
+
+	assert.False(t, result)
 }

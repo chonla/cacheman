@@ -10,6 +10,8 @@ type Config struct {
 	TTL string
 	// Paths that will be cached
 	Paths []string
+	// ExcludedPaths are paths to be excluded from cache
+	ExcludedPaths []string
 	// AdditionalHeaders are injected in return cache
 	AdditionalHeaders map[string]string
 }
