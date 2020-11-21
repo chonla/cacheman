@@ -2,7 +2,7 @@
 
 CacheMan was designed to be middleware for Echo for caching response from `GET` request for a period of time.
 
-## Usage
+## Usage (echo 3)
 
 ```go
 	server := echo.New()
@@ -10,6 +10,17 @@ CacheMan was designed to be middleware for Echo for caching response from `GET` 
 	store, e := cacheman.NewBigCache(&cfg.Cache)
 	if e == nil {
 		server.Use(cacheman.Middleware(&cfg.Cache, store))
+	}
+```
+
+## Usage (echo 4)
+
+```go
+	server := echo.New()
+
+	store, e := cacheman.NewBigCache(&cfg.Cache)
+	if e == nil {
+		server.Use(cacheman.MiddlewareV4(&cfg.Cache, store))
 	}
 ```
 

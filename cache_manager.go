@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/labstack/echo"
+	echo4 "github.com/labstack/echo/v4"
 )
 
 // Manager is cache manager
@@ -31,6 +32,9 @@ type Content struct {
 	Headers http.Header `json:"headers"`
 	Content string      `json:"content"`
 }
+
+var cm *Manager
+var defaultTTL = "5m"
 
 // NewCacheManager creates a cache manager
 func NewCacheManager(conf *Config, cache CacheInterface) *Manager {
@@ -112,6 +116,39 @@ func (c *Manager) Set(path string, b []byte) error {
 
 // TryWrite tries to write cached content if hit and return true, return false if miss
 func (c *Manager) TryWrite(ctx echo.Context) bool {
+	cacheKey := ctx.Request().RequestURI
+	stringifiedCache, e := c.Get(cacheKey)
+	if !e {
+		return false
+	}
+
+	var content Content
+	err := json.Unmarshal(stringifiedCache, &content)
+	if err != nil {
+		return false
+	}
+
+	writer := ctx.Response().Writer
+	for headerKey, headerValues := range content.Headers {
+		for _, headerValue := range headerValues {
+			writer.Header().Set(headerKey, headerValue)
+		}
+	}
+	for headerKey, headerValue := range c.AdditionalHeaders {
+		writer.Header().Set(headerKey, headerValue)
+	}
+
+	writer.WriteHeader(content.Status)
+	byteContent, err := base64.StdEncoding.DecodeString(content.Content)
+	if err != nil {
+		return false
+	}
+	writer.Write(byteContent)
+	return true
+}
+
+// TryWriteV4 tries to write cached content if hit and return true, return false if miss
+func (c *Manager) TryWriteV4(ctx echo4.Context) bool {
 	cacheKey := ctx.Request().RequestURI
 	stringifiedCache, e := c.Get(cacheKey)
 	if !e {
