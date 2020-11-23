@@ -6,25 +6,25 @@ import (
 	"github.com/bradfitz/gomemcache/memcache"
 )
 
-type MemcacheClient struct {
+type MemcachedClient struct {
 	client *memcache.Client
 	ttl    time.Duration
 }
 
-// NewMemcache creates big cache client
-func NewMemcache(config *Config) (*MemcacheClient, error) {
+// NewMemcached creates big cache client
+func NewMemcached(config *Config) (*MemcachedClient, error) {
 	ttl, e := time.ParseDuration(config.TTL)
 	if e != nil {
 		ttl, _ = time.ParseDuration(defaultTTL)
 	}
 	client := memcache.New(config.Server)
-	return &MemcacheClient{
+	return &MemcachedClient{
 		client: client,
 		ttl:    ttl,
 	}, nil
 }
 
-func (c *MemcacheClient) Get(key string) ([]byte, error) {
+func (c *MemcachedClient) Get(key string) ([]byte, error) {
 	result, e := c.client.Get(key)
 	if e != nil {
 		return nil, e
@@ -32,7 +32,7 @@ func (c *MemcacheClient) Get(key string) ([]byte, error) {
 	return result.Value, nil
 }
 
-func (c *MemcacheClient) Set(key string, value []byte) error {
+func (c *MemcachedClient) Set(key string, value []byte) error {
 	return c.client.Set(&memcache.Item{
 		Key:        key,
 		Value:      value,
@@ -40,10 +40,10 @@ func (c *MemcacheClient) Set(key string, value []byte) error {
 	})
 }
 
-func (c *MemcacheClient) Delete(key string) error {
+func (c *MemcachedClient) Delete(key string) error {
 	return c.client.Delete(key)
 }
 
-func (c *MemcacheClient) Reset() error {
+func (c *MemcachedClient) Reset() error {
 	return c.client.DeleteAll()
 }
