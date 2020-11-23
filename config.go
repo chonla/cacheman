@@ -14,4 +14,10 @@ type Config struct {
 	ExcludedPaths []string
 	// AdditionalHeaders are injected in return cache
 	AdditionalHeaders map[string]string
+	// Server is cache server in host:port format
+	Server string
+	// Password is credential for accessing cache service
+	Password string
+	// Database is database name or index
+	Database interface{}
 }
