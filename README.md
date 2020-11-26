@@ -44,6 +44,7 @@ type CacheInterface interface {
 	Set(key string, value []byte) error
 	Delete(key string) error
 	Reset() error
+	Type() string
 }
 ```
 
