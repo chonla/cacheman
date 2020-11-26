@@ -74,7 +74,7 @@ Paths to be excluded from cache. ExcludedPaths has higher priority than Paths. D
 
 Custom headers added into returned cache. Default is `map[string]string{}`,
 
-### CacheInforPath
+### CacheInfoPath
 URI to request cache information. Make it empty to disable it. Default is `<empty>`.
 
 ## License
