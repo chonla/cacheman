@@ -30,9 +30,9 @@ CacheMan was designed to be middleware for Echo for caching response from `GET` 
 
 ## Cache support
 
-* BigCache ([](github.com/allegro/bigcache))
-* Memcache ([](github.com/bradfitz/gomemcache/memcache))
-* Redis ([](github.com/go-redis/redis/v8))
+* BigCache - [allegro/bigcache](github.com/allegro/bigcache)
+* Memcache - [bradfitz/gomemcache](github.com/bradfitz/gomemcache/memcache)
+* Redis - [go-redis/redis](github.com/go-redis/redis/v8)
 
 ## Custom cache
 
