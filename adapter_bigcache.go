@@ -1,6 +1,7 @@
 package cacheman
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/allegro/bigcache"
@@ -39,4 +40,8 @@ func (c *BigCacheClient) Delete(key string) error {
 
 func (c *BigCacheClient) Reset() error {
 	return c.client.Reset()
+}
+
+func (c *BigCacheClient) Type() string {
+	return fmt.Sprintf("%T", c)
 }

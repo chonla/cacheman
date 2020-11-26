@@ -2,6 +2,7 @@ package cacheman
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/go-redis/redis/v8"
@@ -50,4 +51,8 @@ func (c *RedisClient) Delete(key string) error {
 
 func (c *RedisClient) Reset() error {
 	return c.client.FlushAll(c.ctx).Err()
+}
+
+func (c *RedisClient) Type() string {
+	return fmt.Sprintf("%T", c)
 }

@@ -1,6 +1,7 @@
 package cacheman
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/bradfitz/gomemcache/memcache"
@@ -46,4 +47,8 @@ func (c *MemcachedClient) Delete(key string) error {
 
 func (c *MemcachedClient) Reset() error {
 	return c.client.DeleteAll()
+}
+
+func (c *MemcachedClient) Type() string {
+	return fmt.Sprintf("%T", c)
 }
