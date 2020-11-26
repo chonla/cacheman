@@ -20,4 +20,6 @@ type Config struct {
 	Password string
 	// Database is database name or index
 	Database interface{}
+	// CacheInfoPath is URI to request cache information
+	CacheInfoPath string
 }

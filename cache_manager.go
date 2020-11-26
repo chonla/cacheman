@@ -4,9 +4,11 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"net/http"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/labstack/echo"
 	echo4 "github.com/labstack/echo/v4"
@@ -31,6 +33,21 @@ type Content struct {
 	Status  int         `json:"status"`
 	Headers http.Header `json:"headers"`
 	Content string      `json:"content"`
+}
+
+const (
+	// HealthCheckUntested tells that operation has not been tested
+	HealthCheckUntested string = "untested"
+	// HealthCheckFailed tells that operation has failed the test
+	HealthCheckFailed string = "failed"
+	// HealthCheckPassed tells that operation has passed the test
+	HealthCheckPassed string = "passed"
+)
+
+type healthCheckResult struct {
+	SetResult    string `json:"setResult"`
+	GetResult    string `json:"getResult"`
+	DeleteResult string `json:"deleteResult"`
 }
 
 var cm *Manager
@@ -185,4 +202,62 @@ func (c *Manager) Log(msg string) {
 	if c.Verbose {
 		fmt.Println(msg)
 	}
+}
+
+func (c *Manager) healthCheck() *healthCheckResult {
+	cacheContent := "CacheMan"
+	s1 := rand.NewSource(time.Now().UnixNano())
+	r1 := rand.New(s1)
+	cacheKey := fmt.Sprintf("cacheman-%d", r1.Intn(1000))
+	result := &healthCheckResult{
+		SetResult:    HealthCheckUntested,
+		GetResult:    HealthCheckUntested,
+		DeleteResult: HealthCheckUntested,
+	}
+	err := c.Set(cacheKey, []byte(cacheContent))
+	if err != nil {
+		result.SetResult = HealthCheckFailed
+	} else {
+		result.SetResult = HealthCheckPassed
+	}
+	if result.SetResult == HealthCheckPassed {
+		content, found := c.Get(cacheKey)
+		if !found || string(content) != cacheContent {
+			result.GetResult = HealthCheckFailed
+		} else {
+			result.GetResult = HealthCheckPassed
+		}
+		if result.GetResult == HealthCheckPassed {
+			err = c.Cache.Delete(cacheKey)
+			if err != nil {
+				result.DeleteResult = HealthCheckFailed
+			} else {
+				result.DeleteResult = HealthCheckPassed
+			}
+		}
+	}
+	return result
+}
+
+// WriteInfo print cacheman information out to client
+func (c *Manager) WriteInfo(ctx echo.Context) {
+	healthResult := c.healthCheck()
+
+	response := map[string]interface{}{
+		"type":            c.Cache.Type(),
+		"operationHealth": healthResult,
+	}
+
+	ctx.JSON(200, response)
+}
+
+// WriteInfoV4 print cacheman information out to client
+func (c *Manager) WriteInfoV4(ctx echo4.Context) {
+	healthResult := c.healthCheck()
+
+	response := map[string]interface{}{
+		"type":            c.Cache.Type(),
+		"operationHealth": healthResult,
+	}
+	ctx.JSON(200, response)
 }
