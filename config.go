@@ -24,4 +24,6 @@ type Config struct {
 	CacheInfoPath string
 	// PurgePath is URI to purge all content in cache
 	PurgePath string
+	// Namespace to be automatically added into cache key
+	Namespace string
 }

@@ -26,6 +26,7 @@ type Manager struct {
 	ComparableRoutes         []*regexp.Regexp
 	ComparableExcludedRoutes []*regexp.Regexp
 	AdditionalHeaders        map[string]string
+	Namespace                string
 }
 
 // Content is cached content
@@ -69,6 +70,7 @@ func NewCacheManager(conf *Config, cache CacheInterface) *Manager {
 		RouteCount:               len(conf.Paths),
 		ExcludedRouteCount:       len(conf.ExcludedPaths),
 		AdditionalHeaders:        conf.AdditionalHeaders,
+		Namespace:                conf.Namespace,
 	}
 }
 
@@ -114,9 +116,16 @@ func (c *Manager) TestPath(path string) bool {
 	return false
 }
 
+func (c *Manager) createKey(key string) string {
+	if c.Namespace != "" {
+		return fmt.Sprintf("%s.%s", c.Namespace, key)
+	}
+	return key
+}
+
 // Get gets byte content from path key
 func (c *Manager) Get(path string) ([]byte, bool) {
-	content, e := c.Cache.Get(path)
+	content, e := c.Cache.Get(c.createKey(path))
 	if e != nil {
 		c.Log(fmt.Sprintf("Cache misses: %s", path))
 		return []byte{}, false
@@ -128,7 +137,7 @@ func (c *Manager) Get(path string) ([]byte, bool) {
 // Set sets byte content to path key
 func (c *Manager) Set(path string, b []byte) error {
 	c.Log(fmt.Sprintf("Cache sets: %s", path))
-	return c.Cache.Set(path, b)
+	return c.Cache.Set(c.createKey(path), b)
 }
 
 // Purge all content in cache
