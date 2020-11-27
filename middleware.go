@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"net/http"
 
 	"github.com/labstack/echo"
 	echo4 "github.com/labstack/echo/v4"
@@ -17,8 +18,7 @@ func Middleware(config *Config, cache CacheInterface) echo.MiddlewareFunc {
 			if cm.Enabled {
 				cm.Log(fmt.Sprintf("Test path: %s", ctx.Request().RequestURI))
 				if ctx.Request().Method == "GET" {
-					if config.CacheInfoPath != "" &&
-						config.CacheInfoPath == ctx.Request().URL.Path {
+					if enabledByPath(config.CacheInfoPath, ctx.Request().URL.Path) {
 						cm.Log("Cache info request")
 						cm.WriteInfo(ctx)
 					} else {
@@ -51,13 +51,12 @@ func Middleware(config *Config, cache CacheInterface) echo.MiddlewareFunc {
 						}
 					}
 				} else {
-					if ctx.Request().Method == "PURGE" &&
-						config.PurgePath != "" &&
-						config.PurgePath == ctx.Request().URL.Path {
+					if ctx.Request().Method == "PURGE" && enabledByPath(config.PurgePath, ctx.Request().URL.Path) {
 						cm.Purge()
-					} else {
-						cm.Log(fmt.Sprintf("Method does not match: %s", ctx.Request().Method))
+						ctx.NoContent(http.StatusOK)
+						return nil
 					}
+					cm.Log(fmt.Sprintf("Method does not match: %s", ctx.Request().Method))
 				}
 			}
 			return next(ctx)
@@ -73,8 +72,7 @@ func MiddlewareV4(config *Config, cache CacheInterface) echo4.MiddlewareFunc {
 			if cm.Enabled {
 				cm.Log(fmt.Sprintf("Test path: %s", ctx.Request().RequestURI))
 				if ctx.Request().Method == "GET" {
-					if config.CacheInfoPath != "" &&
-						config.CacheInfoPath == ctx.Request().URL.Path {
+					if enabledByPath(config.CacheInfoPath, ctx.Request().URL.Path) {
 						cm.Log("Cache info request")
 						cm.WriteInfoV4(ctx)
 					} else {
@@ -107,10 +105,19 @@ func MiddlewareV4(config *Config, cache CacheInterface) echo4.MiddlewareFunc {
 						}
 					}
 				} else {
+					if ctx.Request().Method == "PURGE" && enabledByPath(config.PurgePath, ctx.Request().URL.Path) {
+						cm.Purge()
+						ctx.NoContent(http.StatusOK)
+						return nil
+					}
 					cm.Log(fmt.Sprintf("Method does not match: %s", ctx.Request().Method))
 				}
 			}
 			return next(ctx)
 		}
 	}
+}
+
+func enabledByPath(expectedPath, actualPath string) bool {
+	return expectedPath != "" && expectedPath == actualPath
 }
