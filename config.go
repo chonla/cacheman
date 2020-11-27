@@ -22,4 +22,6 @@ type Config struct {
 	Database interface{}
 	// CacheInfoPath is URI to request cache information
 	CacheInfoPath string
+	// PurgePath is URI to purge all content in cache
+	PurgePath string
 }

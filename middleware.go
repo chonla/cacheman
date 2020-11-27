@@ -51,7 +51,13 @@ func Middleware(config *Config, cache CacheInterface) echo.MiddlewareFunc {
 						}
 					}
 				} else {
-					cm.Log(fmt.Sprintf("Method does not match: %s", ctx.Request().Method))
+					if ctx.Request().Method == "PURGE" &&
+						config.PurgePath != "" &&
+						config.PurgePath == ctx.Request().URL.Path {
+						cm.Purge()
+					} else {
+						cm.Log(fmt.Sprintf("Method does not match: %s", ctx.Request().Method))
+					}
 				}
 			}
 			return next(ctx)

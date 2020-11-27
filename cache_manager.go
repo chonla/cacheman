@@ -131,6 +131,12 @@ func (c *Manager) Set(path string, b []byte) error {
 	return c.Cache.Set(path, b)
 }
 
+// Purge all content in cache
+func (c *Manager) Purge() error {
+	c.Log("Cache purges")
+	return c.Cache.Reset()
+}
+
 // TryWrite tries to write cached content if hit and return true, return false if miss
 func (c *Manager) TryWrite(ctx echo.Context) bool {
 	cacheKey := ctx.Request().RequestURI

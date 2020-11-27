@@ -75,7 +75,10 @@ Paths to be excluded from cache. ExcludedPaths has higher priority than Paths. D
 Custom headers added into returned cache. Default is `map[string]string{}`,
 
 ### CacheInfoPath
-URI to request cache information. Make it empty to disable it. Default is `<empty>`.
+URI to request cacheman information. Send `GET` request to this path to see cacheman information. Make it empty to disable it. Default is `<empty>`.
+
+### PurgePath
+URI to purge cache. Send `PURGE` request to this path to empty cache. Make it empty to disable it. Default is `<empty>`.
 
 ## License
 
