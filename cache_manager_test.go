@@ -1,7 +1,6 @@
 package cacheman
 
 import (
-	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -158,72 +157,72 @@ func TestMatchPathWithVariableUnmatchFromMissingVariable(t *testing.T) {
 	assert.False(t, result)
 }
 
-func TestSetCacheShouldInvokeSetCache(t *testing.T) {
-	mockCache := new(MockCache)
-	expectedContent := []byte{1, 2, 3, 4}
-	conf := &Config{
-		Enabled: true,
-		Verbose: false,
-		TTL:     "1m",
-		Paths: []string{
-			"/test1",
-			"/test2",
-		},
-		AdditionalHeaders: map[string]string{},
-	}
-	mockCache.On("Set", mock.AnythingOfType("string"), mock.AnythingOfType("[]uint8")).Return(nil)
-	cm := NewCacheManager(conf, mockCache)
+// func TestSetCacheShouldInvokeSetCache(t *testing.T) {
+// 	mockCache := new(MockCache)
+// 	expectedContent := []byte{1, 2, 3, 4}
+// 	conf := &Config{
+// 		Enabled: true,
+// 		Verbose: false,
+// 		TTL:     "1m",
+// 		Paths: []string{
+// 			"/test1",
+// 			"/test2",
+// 		},
+// 		AdditionalHeaders: map[string]string{},
+// 	}
+// 	mockCache.On("Set", mock.AnythingOfType("string"), mock.AnythingOfType("[]uint8")).Return(nil)
+// 	cm := NewCacheManager(conf, mockCache)
 
-	cm.Set("/test2", expectedContent)
+// 	cm.Set("/test2", expectedContent)
 
-	mockCache.AssertCalled(t, "Set", "/test2", expectedContent)
-}
+// 	mockCache.AssertCalled(t, "Set", "/test2", expectedContent)
+// }
 
-func TestGetCacheShouldInvokeGetCache(t *testing.T) {
-	mockCache := new(MockCache)
-	expectedContent := []byte{1, 2, 3, 4}
-	conf := &Config{
-		Enabled: true,
-		Verbose: false,
-		TTL:     "1m",
-		Paths: []string{
-			"/test1",
-			"/test2",
-		},
-		AdditionalHeaders: map[string]string{},
-	}
-	mockCache.On("Get", mock.AnythingOfType("string")).Return(expectedContent, nil)
-	cm := NewCacheManager(conf, mockCache)
+// func TestGetCacheShouldInvokeGetCache(t *testing.T) {
+// 	mockCache := new(MockCache)
+// 	expectedContent := []byte{1, 2, 3, 4}
+// 	conf := &Config{
+// 		Enabled: true,
+// 		Verbose: false,
+// 		TTL:     "1m",
+// 		Paths: []string{
+// 			"/test1",
+// 			"/test2",
+// 		},
+// 		AdditionalHeaders: map[string]string{},
+// 	}
+// 	mockCache.On("Get", mock.AnythingOfType("string")).Return(expectedContent, nil)
+// 	cm := NewCacheManager(conf, mockCache)
 
-	result, ok := cm.Get("/test2")
+// 	result, ok := cm.Get("/test2")
 
-	mockCache.AssertCalled(t, "Get", "/test2")
-	assert.Equal(t, expectedContent, result)
-	assert.True(t, ok)
-}
+// 	mockCache.AssertCalled(t, "Get", "/test2")
+// 	assert.Equal(t, expectedContent, result)
+// 	assert.True(t, ok)
+// }
 
-func TestGetCacheShouldReturnFalseWhenCacheMisses(t *testing.T) {
-	mockCache := new(MockCache)
-	expectedContent := []byte{}
-	conf := &Config{
-		Enabled: true,
-		Verbose: false,
-		TTL:     "1m",
-		Paths: []string{
-			"/test1",
-			"/test2",
-		},
-		AdditionalHeaders: map[string]string{},
-	}
-	mockCache.On("Get", mock.AnythingOfType("string")).Return(expectedContent, errors.New("Error"))
-	cm := NewCacheManager(conf, mockCache)
+// func TestGetCacheShouldReturnFalseWhenCacheMisses(t *testing.T) {
+// 	mockCache := new(MockCache)
+// 	expectedContent := []byte{}
+// 	conf := &Config{
+// 		Enabled: true,
+// 		Verbose: false,
+// 		TTL:     "1m",
+// 		Paths: []string{
+// 			"/test1",
+// 			"/test2",
+// 		},
+// 		AdditionalHeaders: map[string]string{},
+// 	}
+// 	mockCache.On("Get", mock.AnythingOfType("string")).Return(expectedContent, errors.New("Error"))
+// 	cm := NewCacheManager(conf, mockCache)
 
-	result, ok := cm.Get("/test2")
+// 	result, ok := cm.Get("/test2")
 
-	mockCache.AssertCalled(t, "Get", "/test2")
-	assert.Equal(t, expectedContent, result)
-	assert.False(t, ok)
-}
+// 	mockCache.AssertCalled(t, "Get", "/test2")
+// 	assert.Equal(t, expectedContent, result)
+// 	assert.False(t, ok)
+// }
 
 func TestMatchPathWithWildcardAndExcludsion(t *testing.T) {
 	conf := &Config{
