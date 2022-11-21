@@ -1,4 +1,4 @@
-module github.com/titanzerg/cacheman
+module github.com/chonla/cacheman
 
 go 1.15
 
